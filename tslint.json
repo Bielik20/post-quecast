@@ -7,7 +7,6 @@
     "typedef": [true, "call-signature"],
     "no-parameter-reassignment": true,
     "no-this-assignment": true,
-    "no-submodule-imports": true,
     "no-default-export": true,
     "interface-name": [true, "never-prefix"],
     "variable-name": [true, "allow-leading-underscore"],
