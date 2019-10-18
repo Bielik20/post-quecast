@@ -1,17 +1,20 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "es5",
-        "noImplicitAny": false,
-        "rootDir": "./src",
-        "outDir": "./release",
-        "removeComments": true,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
-    },
-    "exclude": [
-        "node_modules",
-        "typings",
-        "release"
-    ]
+  "compilerOptions": {
+    "outDir": "dist/commonjs",
+    "module": "commonjs",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "lib": ["es6", "dom"],
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": false,
+    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "strictNullChecks": false,
+    "target": "es5"
+  },
+  "include": ["src"]
 }
