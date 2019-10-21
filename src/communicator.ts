@@ -1,59 +1,41 @@
-import { fromEvent, merge, Observable, of } from 'rxjs';
-import { mergeMap, shareReplay, take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { INTERNAL } from './actions/internal';
-import { Action, PostMessageEvent } from './models';
-import { mapAction } from './rxjs/map-action';
-import { ofType } from './rxjs/of-type';
-import { onlyOfChannel } from './rxjs/only-of-channel';
-import { onlyPrivate } from './rxjs/only-private';
-import { onlyPublic } from './rxjs/only-public';
-import { onlyValidMessages } from './rxjs/only-valid-messages';
-import { defaultTransmitterOptions, Transmitter, TransmitterOptions } from './transmitter';
+import { Action, libId } from './models';
+import { defaultOptions, PostQuecastOptions } from './options';
+import { Receiver } from './receiver';
+import { Transmitter } from './transmitter';
 
-// tslint:disable-next-line:no-empty-interface
-export interface CommunicatorOptions extends TransmitterOptions {}
-
-export const defaultCommunicatorOptions: CommunicatorOptions = {
-  ...defaultTransmitterOptions,
-};
-
-export class Communicator extends Transmitter {
+export class Communicator {
   actions$: Observable<Action>;
-  protected options: CommunicatorOptions;
+  private readonly options: PostQuecastOptions;
+  private transmitter: Transmitter;
+  private receiver: Receiver;
+  private coordinator: Window = window.top;
 
-  constructor(options: Partial<CommunicatorOptions> = {}) {
-    super(options);
+  constructor(options: Partial<PostQuecastOptions> = {}) {
     this.options = {
-      ...defaultCommunicatorOptions,
+      ...defaultOptions,
       ...options,
     };
-    this.setupActions();
+    this.transmitter = new Transmitter(this.options);
+    this.receiver = new Receiver(this.options);
+    this.actions$ = this.receiver.actions$;
     this.setupConnection();
   }
 
-  private setupActions(): void {
-    const messages$: Observable<PostMessageEvent> = fromEvent(window, 'message').pipe(
-      onlyValidMessages(),
-      onlyOfChannel(this.options.channelId),
-    );
-
-    const history$ = messages$.pipe(
-      onlyPrivate(),
-      mapAction(),
-      ofType(INTERNAL.connected),
-      take(1),
-      mergeMap(action => of(...action.history)),
-    );
-
-    const public$ = messages$.pipe(
-      onlyPublic(),
-      mapAction(),
-    );
-
-    this.actions$ = merge(history$, public$).pipe(shareReplay());
+  emit<T>(action: Action<T>): void {
+    this.transmitter.emit(action);
   }
 
   private setupConnection(): void {
-    this.coordinator.postMessage(this.createMessage({ type: INTERNAL.connect }), '*');
+    this.coordinator.postMessage(
+      {
+        action: { type: INTERNAL.connect, timestamp: new Date().getTime() },
+        channelId: this.options.channelId,
+        private: true,
+        libId,
+      },
+      '*',
+    );
   }
 }
