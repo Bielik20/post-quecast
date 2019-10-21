@@ -3,7 +3,7 @@ import { Action, libId } from './models';
 
 export class Channel {
   private connections = new Set<Window>([window.top]);
-  private history: Action[] = []; // TODO: sorting
+  private history: Action[] = [];
 
   constructor(private channelId: string) {}
 
