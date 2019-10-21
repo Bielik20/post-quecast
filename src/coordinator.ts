@@ -8,7 +8,7 @@ import { onlyValidMessages } from './rxjs/only-valid-messages';
 
 export class Coordinator {
   private connections = new Set<Window>();
-  private history: any[] = [];
+  private history: Action[] = [];
 
   constructor() {
     this.connections.add(window);
