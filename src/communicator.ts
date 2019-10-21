@@ -1,5 +1,5 @@
-import { fromEvent, merge, Observable, of, Subject } from 'rxjs';
-import { filter, map, mergeMap, take, tap } from 'rxjs/operators';
+import { fromEvent, merge, Observable, of } from 'rxjs';
+import { mergeMap, take, tap } from 'rxjs/operators';
 import { INTERNAL } from './actions/internal';
 import { Action, libId, PostMessageData, PostMessageEvent } from './models';
 import { mapAction } from './rxjs/map-action';
@@ -10,65 +10,39 @@ import { onlyPublic } from './rxjs/only-public';
 import { onlyValidMessages } from './rxjs/only-valid-messages';
 
 export class Communicator {
+  actions$: Observable<Action>;
   private coordinator: Window = window.top;
-  private messages$: Observable<PostMessageEvent> = fromEvent(window, 'message').pipe(
-    onlyValidMessages(),
-    onlyOfChannel(this.channelId),
-  );
-  actions$: Observable<Action> = new Subject();
-  history: Action[] = [];
 
   constructor(private channelId: string, private instanceName: string) {
-    this.listen();
-    this.connect();
+    this.setupActions();
+    this.setupConnection();
   }
 
-  private connect(): void {
-    this.coordinator.postMessage(this.createMessage({ type: INTERNAL.connect }), '*');
-  }
+  private setupActions(): void {
+    const messages$: Observable<PostMessageEvent> = fromEvent(window, 'message').pipe(
+      onlyValidMessages(),
+      onlyOfChannel(this.channelId),
+    );
 
-  private listen(): void {
-    // this.messages$
-    //   .pipe(
-    //     onlyPrivate(),
-    //     ofType(INTERNAL.connected),
-    //     take(1),
-    //   )
-    //   .subscribe(event => {
-    //     return console.log(this.instanceName, event.data.action);
-    //   });
-    //
-    // this.messages$
-    //   .pipe(
-    //     onlyPublic(),
-    //     mapAction(),
-    //   )
-    //   .subscribe((action: Action) => {
-    //     (this.actions as Subject<Action>).next(action);
-    //   });
-
-    const a = this.messages$.pipe(
+    const history$ = messages$.pipe(
       onlyPrivate(),
       ofType(INTERNAL.connected),
       take(1),
-      tap(event => (this.history = event.data.action.history)),
-      tap(event => console.log(this.instanceName, event.data.action)),
-      map(() => null),
+      mapAction(),
+      tap(action => console.log(this.instanceName, action)),
+      mergeMap(action => of(...action.history)),
     );
 
-    const b = this.messages$.pipe(
+    const public$ = messages$.pipe(
       onlyPublic(),
       mapAction(),
     );
 
-    const c = merge(a, b).pipe(
-      filter(event => !!event),
-      tap(console.log),
-      tap(action => this.history.push(action)), // TODO: sorting
-      mergeMap(() => of(this.history)),
-    );
+    this.actions$ = merge(history$, public$); // TODO: may need shareReplay
+  }
 
-    this.actions$ = c;
+  private setupConnection(): void {
+    this.coordinator.postMessage(this.createMessage({ type: INTERNAL.connect }), '*');
   }
 
   emit<T>(action: Action<T>): void {
