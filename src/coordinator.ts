@@ -1,68 +1,45 @@
 import { fromEvent } from 'rxjs';
 import { INTERNAL } from './actions/internal';
-import { Action, libId, PostMessageData } from './models';
+import { Channel } from './channel';
 import { ofType } from './rxjs/of-type';
 import { onlyExternal } from './rxjs/only-external';
 import { onlyPrivate } from './rxjs/only-private';
 import { onlyValidMessages } from './rxjs/only-valid-messages';
 
+// export function setupPostQuecast(): void {}
+
 export class Coordinator {
-  private connections = new Set<Window>();
-  private history: Action[] = []; // TODO: sorting
+  private channels = new Map<string, Channel>();
 
   constructor() {
-    this.connections.add(window);
     this.listen();
   }
 
   private listen(): void {
-    const messages = fromEvent(window, 'message').pipe(
+    const messages$ = fromEvent(window, 'message').pipe(
       onlyValidMessages(),
       onlyPrivate(),
     );
 
-    messages.pipe(ofType(INTERNAL.connect)).subscribe(event => {
-      const connection = event.source as Window;
+    messages$.pipe(ofType(INTERNAL.connect)).subscribe(event => {
+      const channel: Channel = this.getChannel(event.data.channelId);
 
-      this.connections.add(connection);
-
-      console.log('coordinator', event.data.action);
-
-      connection.postMessage(
-        this.createMessage(
-          { type: INTERNAL.connected, history: this.history },
-          event.data.channelId,
-          true,
-        ),
-        '*',
-      );
+      channel.addConnection(event.source);
+      console.log('coordinator', event.data);
     });
 
-    messages.pipe(onlyExternal()).subscribe(event => {
-      this.history.push(event.data.action);
-      this.broadcast(event.data.action, event.data.channelId);
+    messages$.pipe(onlyExternal()).subscribe(event => {
+      const channel: Channel = this.getChannel(event.data.channelId);
+
+      channel.broadcast(event.data.action);
     });
   }
 
-  private broadcast<T>(action: Action<T>, channelId: string): void {
-    this.connections.forEach(connection => {
-      connection.postMessage({ action, channelId, libId }, '*');
-    });
-  }
+  private getChannel(channelId: string): Channel {
+    if (!this.channels.has(channelId)) {
+      this.channels.set(channelId, new Channel(channelId));
+    }
 
-  private createMessage<T>(
-    action: Action<T>,
-    channelId: string,
-    isPrivate: boolean,
-  ): PostMessageData<T> {
-    return {
-      action: {
-        ...action,
-        timestamp: new Date().getTime(),
-      },
-      private: isPrivate,
-      channelId,
-      libId,
-    };
+    return this.channels.get(channelId);
   }
 }
