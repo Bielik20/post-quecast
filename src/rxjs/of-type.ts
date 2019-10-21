@@ -1,9 +1,9 @@
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { PostMessageEvent } from '../models';
+import { Action } from '../models';
 
-export const ofType = (...types: string[]) => (
-  source: Observable<PostMessageEvent>,
-): Observable<PostMessageEvent> => {
-  return source.pipe(filter(event => types.some(type => event.data.action.type === type)));
+export const ofType = <T>(...types: string[]) => (
+  source: Observable<Action<T>>,
+): Observable<Action<T>> => {
+  return source.pipe(filter(action => types.some(type => action.type === type)));
 };

@@ -26,9 +26,9 @@ export class Communicator {
 
     const history$ = messages$.pipe(
       onlyPrivate(),
+      mapAction(),
       ofType(INTERNAL.connected),
       take(1),
-      mapAction(),
       tap(action => console.log(this.instanceName, action)),
       mergeMap(action => of(...action.history)),
     );

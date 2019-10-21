@@ -1,3 +1,4 @@
 export * from './communicator';
-export * from './coordinator';
+export * from './setup';
 export * from './rxjs/of-type';
+export * from './rxjs/only-new';
