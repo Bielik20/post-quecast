@@ -1,19 +1,32 @@
 import { fromEvent, merge, Observable, of } from 'rxjs';
-import { mergeMap, shareReplay, take, tap } from 'rxjs/operators';
+import { mergeMap, shareReplay, take } from 'rxjs/operators';
 import { INTERNAL } from './actions/internal';
-import { Action, libId, PostMessageData, PostMessageEvent } from './models';
+import { Action, PostMessageEvent } from './models';
 import { mapAction } from './rxjs/map-action';
 import { ofType } from './rxjs/of-type';
 import { onlyOfChannel } from './rxjs/only-of-channel';
 import { onlyPrivate } from './rxjs/only-private';
 import { onlyPublic } from './rxjs/only-public';
 import { onlyValidMessages } from './rxjs/only-valid-messages';
+import { defaultTransmitterOptions, Transmitter, TransmitterOptions } from './transmitter';
 
-export class Communicator {
+// tslint:disable-next-line:no-empty-interface
+export interface CommunicatorOptions extends TransmitterOptions {}
+
+export const defaultCommunicatorOptions: CommunicatorOptions = {
+  ...defaultTransmitterOptions,
+};
+
+export class Communicator extends Transmitter {
   actions$: Observable<Action>;
-  private coordinator: Window = window.top;
+  protected options: CommunicatorOptions;
 
-  constructor(private channelId: string, private instanceName: string) {
+  constructor(options: Partial<CommunicatorOptions> = {}) {
+    super(options);
+    this.options = {
+      ...defaultCommunicatorOptions,
+      ...options,
+    };
     this.setupActions();
     this.setupConnection();
   }
@@ -21,7 +34,7 @@ export class Communicator {
   private setupActions(): void {
     const messages$: Observable<PostMessageEvent> = fromEvent(window, 'message').pipe(
       onlyValidMessages(),
-      onlyOfChannel(this.channelId),
+      onlyOfChannel(this.options.channelId),
     );
 
     const history$ = messages$.pipe(
@@ -29,7 +42,6 @@ export class Communicator {
       mapAction(),
       ofType(INTERNAL.connected),
       take(1),
-      tap(action => console.log(this.instanceName, action)),
       mergeMap(action => of(...action.history)),
     );
 
@@ -43,21 +55,5 @@ export class Communicator {
 
   private setupConnection(): void {
     this.coordinator.postMessage(this.createMessage({ type: INTERNAL.connect }), '*');
-  }
-
-  emit<T>(action: Action<T>): void {
-    this.coordinator.postMessage(this.createMessage(action), '*');
-  }
-
-  private createMessage<T>(action: Action<T>): PostMessageData<T> {
-    return {
-      action: {
-        ...action,
-        timestamp: new Date().getTime(),
-      },
-      channelId: this.channelId,
-      private: true,
-      libId,
-    };
   }
 }
