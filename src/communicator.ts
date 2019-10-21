@@ -1,5 +1,5 @@
 import { fromEvent, merge, Observable, of } from 'rxjs';
-import { mergeMap, take, tap } from 'rxjs/operators';
+import { mergeMap, shareReplay, take, tap } from 'rxjs/operators';
 import { INTERNAL } from './actions/internal';
 import { Action, libId, PostMessageData, PostMessageEvent } from './models';
 import { mapAction } from './rxjs/map-action';
@@ -38,7 +38,7 @@ export class Communicator {
       mapAction(),
     );
 
-    this.actions$ = merge(history$, public$); // TODO: may need shareReplay
+    this.actions$ = merge(history$, public$).pipe(shareReplay());
   }
 
   private setupConnection(): void {
