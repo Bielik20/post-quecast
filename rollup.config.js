@@ -8,7 +8,7 @@ const pkg = require('./package.json');
 
 /**
  * Adds @__PURE__ to every instance (class, const method etc.) to allow tree shaking
- * @returns {{renderChunk(string): *}|{code: string, map: null}}
+ * @returns {{renderChunk(string): {code: string, map: null}}}
  */
 export function markAsPure() {
   return {
