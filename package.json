@@ -28,11 +28,10 @@
   "module": "./dist/module/index.js",
   "typings": "./dist/types/index.d.ts",
   "scripts": {
-    "start": "tsc -w",
     "prepublishOnly": "npm run build",
     "prebuild": "rimraf dist",
-    "build": "npm run tsc",
-    "watch": "npm run tsc:module -- -w",
+    "build": "rollup -c rollup.config.js",
+    "watch": "npm run build -- -w",
     "lint": "tslint ./src/**/*.ts ./e2e/**/*.ts",
     "lint:fix": "tslint --fix ./src/**/*.ts ./e2e/**/*.ts -t verbose",
     "prettier": "prettier --write '**/*.{ts,js,json,css,scss,html}'",
@@ -41,14 +40,10 @@
     "test:watch": "jest --coverage --watch",
     "test:prod": "npm run lint && npm run test -- --no-cache",
     "report-coverage": "cat ./coverage/lcov.info | coveralls",
-    "tsc": "npm run tsc:module && npm run tsc:commonjs",
-    "tsc:module": "tsc --project tsconfig.module.json",
-    "tsc:commonjs": "tsc",
     "commit": "git-cz",
     "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.3"
   },
   "devDependencies": {
@@ -66,6 +61,13 @@
     "lint-staged": "^9.2.5",
     "prettier": "^1.18.2",
     "rimraf": "^2.6.2",
+    "rollup": "^1.10.1",
+    "rollup-plugin-commonjs": "^9.1.8",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^4.2.3",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-typescript2": "^0.21.0",
+    "rollup-plugin-uglify": "^6.0.2",
     "semantic-release": "^15.13.24",
     "source-map-support": "^0.5.9",
     "ts-jest": "^24.1.0",
