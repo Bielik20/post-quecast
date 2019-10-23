@@ -1,5 +1,5 @@
+import { LIB_ID } from '../utils/constants';
 import { Coordinator } from './coordinator';
-import { libId } from './models';
 
 export function setupPostQuecast(): void {
   const head: any = window.top;
@@ -8,12 +8,12 @@ export function setupPostQuecast(): void {
     throw Error(`You can only setup Post Quecast on top level window.`);
   }
 
-  if (!!head[libId]) {
+  if (!!head[LIB_ID]) {
     throw Error(`You can only setup Post Quecast once.`);
   }
 
   const coordinator = new Coordinator();
 
   coordinator.init();
-  head[libId] = coordinator;
+  head[LIB_ID] = coordinator;
 }

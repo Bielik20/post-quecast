@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { PostMessageEvent } from '../models';
+import { PostMessageEvent } from '../utils/post-message-event';
 
 export const ofEventType = (...types: string[]) => (
   source: Observable<PostMessageEvent>,

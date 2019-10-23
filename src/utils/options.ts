@@ -2,6 +2,6 @@ export interface PostQuecastOptions {
   channelId: string;
 }
 
-export const defaultOptions: PostQuecastOptions = {
+export const DEFAULT_OPTIONS: PostQuecastOptions = {
   channelId: 'default',
 };

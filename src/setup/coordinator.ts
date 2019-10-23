@@ -1,10 +1,10 @@
 import { fromEvent } from 'rxjs';
-import { INTERNAL } from './actions';
+import { ofEventType } from '../rxjs/of-event-type';
+import { onlyExternal } from '../rxjs/only-external';
+import { onlyPrivate } from '../rxjs/only-private';
+import { onlyValidMessages } from '../rxjs/only-valid-messages';
+import { INTERNAL_TYPES } from '../utils/constants';
 import { Channel } from './channel';
-import { ofEventType } from './rxjs/of-event-type';
-import { onlyExternal } from './rxjs/only-external';
-import { onlyPrivate } from './rxjs/only-private';
-import { onlyValidMessages } from './rxjs/only-valid-messages';
 
 export class Coordinator {
   private channels = new Map<string, Channel>();
@@ -19,7 +19,7 @@ export class Coordinator {
   }
 
   private handleConnect(): void {
-    this.messages$.pipe(ofEventType(INTERNAL.connect)).subscribe(event => {
+    this.messages$.pipe(ofEventType(INTERNAL_TYPES.connect)).subscribe(event => {
       const channel: Channel = this.getChannel(event.data.channelId);
 
       channel.addConnection(event.source);

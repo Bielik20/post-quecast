@@ -1,12 +1,13 @@
-import { Action, libId } from './models';
-import { defaultOptions, PostQuecastOptions } from './options';
+import { Action } from './utils/action';
+import { LIB_ID } from './utils/constants';
+import { DEFAULT_OPTIONS, PostQuecastOptions } from './utils/options';
 
 export class Transmitter {
   private options: PostQuecastOptions;
 
   constructor(options: Partial<PostQuecastOptions> = {}) {
     this.options = {
-      ...defaultOptions,
+      ...DEFAULT_OPTIONS,
       ...options,
     };
   }
@@ -22,7 +23,7 @@ export class Transmitter {
         },
         channelId: this.options.channelId,
         private: true,
-        libId,
+        libId: LIB_ID,
       },
       '*',
     );

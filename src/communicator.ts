@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
-import { Action } from './models';
-import { defaultOptions, PostQuecastOptions } from './options';
 import { Receiver } from './receiver';
 import { Transmitter } from './transmitter';
+import { Action } from './utils/action';
+import { DEFAULT_OPTIONS, PostQuecastOptions } from './utils/options';
 
 export class Communicator {
   actions$: Observable<Action>;
@@ -12,7 +12,7 @@ export class Communicator {
 
   constructor(options: Partial<PostQuecastOptions> = {}) {
     this.options = {
-      ...defaultOptions,
+      ...DEFAULT_OPTIONS,
       ...options,
     };
     this.transmitter = new Transmitter(this.options);

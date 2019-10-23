@@ -1,14 +1,15 @@
 import { fromEvent, merge, Observable, of } from 'rxjs';
 import { mergeMap, shareReplay, take } from 'rxjs/operators';
-import { INTERNAL } from './actions';
-import { Action, libId, PostMessageEvent } from './models';
-import { PostQuecastOptions } from './options';
 import { mapAction } from './rxjs/map-action';
 import { ofType } from './rxjs/of-type';
 import { onlyOfChannel } from './rxjs/only-of-channel';
 import { onlyPrivate } from './rxjs/only-private';
 import { onlyPublic } from './rxjs/only-public';
 import { onlyValidMessages } from './rxjs/only-valid-messages';
+import { Action } from './utils/action';
+import { INTERNAL_TYPES, LIB_ID } from './utils/constants';
+import { PostQuecastOptions } from './utils/options';
+import { PostMessageEvent } from './utils/post-message-event';
 
 export class Receiver {
   actions$: Observable<Action>;
@@ -27,7 +28,7 @@ export class Receiver {
     const history$ = messages$.pipe(
       onlyPrivate(),
       mapAction(),
-      ofType(INTERNAL.connected),
+      ofType(INTERNAL_TYPES.connected),
       take(1),
       mergeMap(action => of(...action.history)),
     );
@@ -45,10 +46,10 @@ export class Receiver {
 
     coordinator.postMessage(
       {
-        action: { type: INTERNAL.connect, timestamp: new Date().getTime() },
+        action: { type: INTERNAL_TYPES.connect, timestamp: new Date().getTime() },
         channelId: this.options.channelId,
         private: true,
-        libId,
+        libId: LIB_ID,
       },
       '*',
     );

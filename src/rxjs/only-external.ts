@@ -1,14 +1,15 @@
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { INTERNAL } from '../actions';
-import { PostMessageEvent } from '../models';
+import { INTERNAL_TYPES } from '../utils/constants';
+import { PostMessageEvent } from '../utils/post-message-event';
 
 export const onlyExternal = () => (
   source: Observable<PostMessageEvent>,
 ): Observable<PostMessageEvent> => {
   return source.pipe(
     filter(
-      event => !Object.values(INTERNAL).some((type: string) => event.data.action.type === type),
+      event =>
+        !Object.values(INTERNAL_TYPES).some((type: string) => event.data.action.type === type),
     ),
   );
 };
