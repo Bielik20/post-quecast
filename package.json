@@ -8,6 +8,9 @@
   "keywords": [
     "typescript",
     "broadcast",
+    "history",
+    "remember",
+    "iframe",
     "post message",
     "rxjs",
     "queue"
