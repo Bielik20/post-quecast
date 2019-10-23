@@ -1,5 +1,5 @@
 import { fromEvent } from 'rxjs';
-import { INTERNAL } from './actions/internal';
+import { INTERNAL } from './actions';
 import { Channel } from './channel';
 import { ofEventType } from './rxjs/of-event-type';
 import { onlyExternal } from './rxjs/only-external';

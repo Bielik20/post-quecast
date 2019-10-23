@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { INTERNAL } from '../actions/internal';
+import { INTERNAL } from '../actions';
 import { PostMessageEvent } from '../models';
 
 export const onlyExternal = () => (

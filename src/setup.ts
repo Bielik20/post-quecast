@@ -4,12 +4,16 @@ import { libId } from './models';
 export function setupPostQuecast(): void {
   const head: any = window.top;
 
-  if (!!head[libId]) {
-    console.error(`Attempting to call setupPostQuecast when it is already initialized`);
-  } else {
-    const coordinator = new Coordinator();
-
-    coordinator.init();
-    head[libId] = coordinator;
+  if (window !== head) {
+    throw Error(`You can only setup Post Quecast on top level window.`);
   }
+
+  if (!!head[libId]) {
+    throw Error(`You can only setup Post Quecast once.`);
+  }
+
+  const coordinator = new Coordinator();
+
+  coordinator.init();
+  head[libId] = coordinator;
 }

@@ -1,7 +1,7 @@
 import { fromEvent, merge, Observable, of } from 'rxjs';
 import { mergeMap, shareReplay, take } from 'rxjs/operators';
-import { INTERNAL } from './actions/internal';
-import { Action, PostMessageEvent } from './models';
+import { INTERNAL } from './actions';
+import { Action, libId, PostMessageEvent } from './models';
 import { PostQuecastOptions } from './options';
 import { mapAction } from './rxjs/map-action';
 import { ofType } from './rxjs/of-type';
@@ -15,6 +15,7 @@ export class Receiver {
 
   constructor(private options: PostQuecastOptions) {
     this.setupActions();
+    this.setupConnection();
   }
 
   private setupActions(): void {
@@ -37,5 +38,19 @@ export class Receiver {
     );
 
     this.actions$ = merge(history$, public$).pipe(shareReplay());
+  }
+
+  private setupConnection(): void {
+    const coordinator = window.top;
+
+    coordinator.postMessage(
+      {
+        action: { type: INTERNAL.connect, timestamp: new Date().getTime() },
+        channelId: this.options.channelId,
+        private: true,
+        libId,
+      },
+      '*',
+    );
   }
 }

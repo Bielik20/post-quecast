@@ -1,4 +1,4 @@
-import { INTERNAL } from './actions/internal';
+import { INTERNAL } from './actions';
 import { Action, libId } from './models';
 
 export class Channel {

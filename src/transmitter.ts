@@ -2,8 +2,7 @@ import { Action, libId } from './models';
 import { defaultOptions, PostQuecastOptions } from './options';
 
 export class Transmitter {
-  protected coordinator: Window = window.top;
-  protected options: PostQuecastOptions;
+  private options: PostQuecastOptions;
 
   constructor(options: Partial<PostQuecastOptions> = {}) {
     this.options = {
@@ -13,7 +12,9 @@ export class Transmitter {
   }
 
   emit<T>(action: Action<T>): void {
-    this.coordinator.postMessage(
+    const coordinator = window.top;
+
+    coordinator.postMessage(
       {
         action: {
           ...action,
