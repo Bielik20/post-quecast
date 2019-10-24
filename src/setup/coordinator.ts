@@ -23,7 +23,6 @@ export class Coordinator {
       const channel: Channel = this.getChannel(event.data.channelId);
 
       channel.addConnection(event.source);
-      console.log('coordinator', event.data);
     });
   }
 
