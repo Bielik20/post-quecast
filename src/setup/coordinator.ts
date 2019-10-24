@@ -1,14 +1,15 @@
-import { fromEvent } from 'rxjs';
+import { fromEvent, Observable } from 'rxjs';
 import { ofEventType } from '../rxjs/of-event-type';
 import { onlyExternal } from '../rxjs/only-external';
 import { onlyPrivate } from '../rxjs/only-private';
 import { onlyValidMessages } from '../rxjs/only-valid-messages';
 import { INTERNAL_TYPES } from '../utils/constants';
+import { PostMessageEvent } from '../utils/post-message-event';
 import { Channel } from './channel';
 
 export class Coordinator {
   private channels = new Map<string, Channel>();
-  private messages$ = fromEvent(window, 'message').pipe(
+  private messages$: Observable<PostMessageEvent> = fromEvent(window, 'message').pipe(
     onlyValidMessages(),
     onlyPrivate(),
   );
