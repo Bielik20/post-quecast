@@ -1,15 +1,15 @@
 import { fromEvent, merge, Observable, of } from 'rxjs';
 import { mergeMap, shareReplay, take } from 'rxjs/operators';
+import { Action } from './models/action';
+import { INTERNAL_TYPES, LIB_ID } from './models/constants';
+import { PostQuecastOptions } from './models/options';
+import { PostMessageEvent } from './models/post-message-event';
 import { mapAction } from './rxjs/map-action';
 import { ofType } from './rxjs/of-type';
 import { onlyOfChannel } from './rxjs/only-of-channel';
 import { onlyPrivate } from './rxjs/only-private';
 import { onlyPublic } from './rxjs/only-public';
 import { onlyValidMessages } from './rxjs/only-valid-messages';
-import { Action } from './utils/action';
-import { INTERNAL_TYPES, LIB_ID } from './utils/constants';
-import { PostQuecastOptions } from './utils/options';
-import { PostMessageEvent } from './utils/post-message-event';
 
 export class Receiver {
   actions$: Observable<Action>;

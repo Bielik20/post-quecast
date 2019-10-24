@@ -1,8 +1,9 @@
+import { Host } from './host';
 import { isPostMessageData, PostMessageData } from './post-message-data';
 
 export interface PostMessageEvent<T = any> {
   data: PostMessageData<T>;
-  source: Window;
+  source: Host;
 }
 
 export function isPostMessageEvent(input: any): input is PostMessageEvent {

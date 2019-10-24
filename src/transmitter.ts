@@ -1,6 +1,6 @@
-import { Action } from './utils/action';
-import { LIB_ID } from './utils/constants';
-import { DEFAULT_OPTIONS, PostQuecastOptions } from './utils/options';
+import { Action } from './models/action';
+import { LIB_ID } from './models/constants';
+import { DEFAULT_OPTIONS, PostQuecastOptions } from './models/options';
 
 export class Transmitter {
   private options: PostQuecastOptions;

@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { Action } from '../utils/action';
+import { Action } from '../models/action';
 
 export const ofType = <T>(...types: string[]) => (
   source: Observable<Action<T>>,

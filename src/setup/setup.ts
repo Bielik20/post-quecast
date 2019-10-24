@@ -1,4 +1,4 @@
-import { LIB_ID } from '../utils/constants';
+import { LIB_ID } from '../models/constants';
 import { Coordinator } from './coordinator';
 
 export function setupPostQuecast(): void {
@@ -12,7 +12,7 @@ export function setupPostQuecast(): void {
     throw Error(`You can only setup Post Quecast once.`);
   }
 
-  const coordinator = new Coordinator();
+  const coordinator = new Coordinator(head);
 
   coordinator.init();
   head[LIB_ID] = coordinator;

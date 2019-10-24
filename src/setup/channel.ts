@@ -1,13 +1,14 @@
-import { Action } from '../utils/action';
-import { INTERNAL_TYPES, LIB_ID } from '../utils/constants';
+import { Action } from '../models/action';
+import { INTERNAL_TYPES, LIB_ID } from '../models/constants';
+import { Host } from '../models/host';
 
 export class Channel {
-  private connections = new Set<Window>([window.top]);
+  private connections = new Set<Host>([window.top]);
   private history: Action[] = [];
 
   constructor(private channelId: string) {}
 
-  addConnection(connection: Window): void {
+  addConnection(connection: Host): void {
     this.connections.add(connection);
 
     connection.postMessage(

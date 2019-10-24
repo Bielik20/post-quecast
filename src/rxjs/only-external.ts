@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { INTERNAL_TYPES } from '../utils/constants';
-import { PostMessageEvent } from '../utils/post-message-event';
+import { INTERNAL_TYPES } from '../models/constants';
+import { PostMessageEvent } from '../models/post-message-event';
 
 export const onlyExternal = () => (
   source: Observable<PostMessageEvent>,

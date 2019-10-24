@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
+import { Action } from './models/action';
+import { DEFAULT_OPTIONS, PostQuecastOptions } from './models/options';
 import { Receiver } from './receiver';
 import { Transmitter } from './transmitter';
-import { Action } from './utils/action';
-import { DEFAULT_OPTIONS, PostQuecastOptions } from './utils/options';
 
 export class Communicator {
   actions$: Observable<Action>;

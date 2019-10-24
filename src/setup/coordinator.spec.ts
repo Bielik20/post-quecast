@@ -1,6 +1,6 @@
-import { mockPostMessages } from '../../test-helpers/mock-postmessages';
-import { INTERNAL_TYPES, LIB_ID } from '../utils/constants';
-import { PostMessageData } from '../utils/post-message-data';
+import { INTERNAL_TYPES, LIB_ID } from '../models/constants';
+import { createHostStub, HostStub } from '../models/host.stub';
+import { PostMessageData } from '../models/post-message-data';
 import { Channel } from './channel';
 import { Coordinator } from './coordinator';
 
@@ -8,29 +8,62 @@ jest.mock('./channel');
 
 describe('Coordinator', () => {
   const channelMock: jest.Mock = Channel as any;
-
-  beforeAll(() => {
-    mockPostMessages();
-    new Coordinator().init();
-  });
+  let hostStub: HostStub;
 
   beforeEach(() => {
     channelMock.mockClear();
+    hostStub = createHostStub();
+    new Coordinator(hostStub).init();
   });
 
-  it('should create separate channel for each channel id', () => {
-    window.postMessage(createConnectMessage('1'), '*');
-    window.postMessage(createConnectMessage('1'), '*');
-    window.postMessage(createConnectMessage('2'), '*');
-    window.postMessage(createMessage('3'), '*');
+  it('should create channel on connect message', () => {
+    hostStub.postMessage(createConnectMessage('1'), '*');
+    hostStub.postMessage(createConnectMessage('1'), '*');
+    hostStub.postMessage(createConnectMessage('2'), '*');
+    hostStub.postMessage(createMessage('3'), '*');
+
+    expect(channelMock.mock.instances.length).toBe(3);
+    expect(channelMock.mock.instances[0].addConnection).toHaveBeenCalledTimes(2);
+    expect(channelMock.mock.instances[0].broadcast).toHaveBeenCalledTimes(0);
+    expect(channelMock.mock.instances[1].addConnection).toHaveBeenCalledTimes(1);
+    expect(channelMock.mock.instances[1].broadcast).toHaveBeenCalledTimes(0);
+  });
+
+  it('should create channel on regular message', () => {
+    hostStub.postMessage(createMessage('1'), '*');
+
+    expect(channelMock.mock.instances.length).toBe(1);
+    expect(channelMock.mock.instances[0].addConnection).toHaveBeenCalledTimes(0);
+    expect(channelMock.mock.instances[0].broadcast).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not create on public connect message', () => {
+    hostStub.postMessage({ ...createConnectMessage('1'), private: false }, '*');
+
+    expect(channelMock.mock.instances.length).toBe(0);
+  });
+
+  it('should broadcast on regular message', () => {
+    hostStub.postMessage(createMessage('1'), '*');
+    hostStub.postMessage(createConnectMessage('1'), '*');
+    hostStub.postMessage(createMessage('1'), '*');
+    hostStub.postMessage(createMessage('1'), '*');
+    hostStub.postMessage(createMessage('2'), '*');
 
     expect(channelMock.mock.instances.length).toBe(2);
-    expect(channelMock.mock.instances[0].addConnection).toHaveBeenCalledTimes(2);
-    expect(channelMock.mock.instances[1].addConnection).toHaveBeenCalledTimes(1);
+    expect(channelMock.mock.instances[0].broadcast).toHaveBeenCalledTimes(3);
+    expect(channelMock.mock.instances[1].broadcast).toHaveBeenCalledTimes(1);
+    expect(channelMock.mock.instances[0].broadcast.mock.calls[0][0].type).toEqual('message');
+    expect(channelMock.mock.instances[0].broadcast.mock.calls[1][0].type).toEqual('message');
+    expect(channelMock.mock.instances[0].broadcast.mock.calls[2][0].type).toEqual('message');
   });
 
-  it('', () => {
-    console.log(channelMock.mock.instances.length);
+  it('should not broadcast on public regular message', () => {
+    hostStub.postMessage(createConnectMessage('1'), '*');
+    hostStub.postMessage({ ...createMessage('1'), private: false }, '*');
+
+    expect(channelMock.mock.instances.length).toBe(1);
+    expect(channelMock.mock.instances[0].broadcast).toHaveBeenCalledTimes(0);
   });
 });
 
@@ -53,6 +86,7 @@ function createMessage(channelId: string): PostMessageData {
       timestamp: 0,
     },
     libId: LIB_ID,
+    private: true,
     channelId,
   };
 }
