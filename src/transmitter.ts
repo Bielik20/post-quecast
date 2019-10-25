@@ -13,9 +13,7 @@ export class Transmitter {
   }
 
   emit<T>(action: Action<T>): void {
-    const coordinator = window.top;
-
-    coordinator.postMessage(
+    this.options.coordinatorHost.postMessage(
       {
         action: {
           ...action,

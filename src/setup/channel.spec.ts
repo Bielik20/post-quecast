@@ -6,14 +6,14 @@ describe('Channel', () => {
   const dateMock = jest.spyOn(Date, 'now');
 
   it('should send connected message on addConnection', () => {
-    const parentHost = createHostMock();
-    const channel = new Channel('1', parentHost);
+    const coordinatorHost = createHostMock();
+    const channel = new Channel('1', coordinatorHost);
 
-    dateMock.mockImplementation(() => 10);
-    channel.addConnection(parentHost);
+    dateMock.mockReturnValue(10);
+    channel.addConnection(coordinatorHost);
 
-    expect(parentHost.postMessage).toHaveBeenCalledTimes(1);
-    expect(parentHost.postMessage.mock.calls[0][0]).toEqual({
+    expect(coordinatorHost.postMessage).toHaveBeenCalledTimes(1);
+    expect(coordinatorHost.postMessage.mock.calls[0][0]).toEqual({
       action: {
         type: INTERNAL_TYPES.connected,
         timestamp: 10,
@@ -25,14 +25,14 @@ describe('Channel', () => {
     });
   });
 
-  it('should broadcast message to parent host', () => {
-    const parentHost = createHostMock();
-    const channel = new Channel('1', parentHost);
+  it('should broadcast message to coordinator host', () => {
+    const coordinatorHost = createHostMock();
+    const channel = new Channel('1', coordinatorHost);
 
     channel.broadcast({ type: 'message', foo: 'bar' });
 
-    expect(parentHost.postMessage).toHaveBeenCalledTimes(1);
-    expect(parentHost.postMessage.mock.calls[0][0]).toEqual({
+    expect(coordinatorHost.postMessage).toHaveBeenCalledTimes(1);
+    expect(coordinatorHost.postMessage.mock.calls[0][0]).toEqual({
       action: {
         type: 'message',
         foo: 'bar',
@@ -43,9 +43,9 @@ describe('Channel', () => {
   });
 
   it('should broadcast message to connected', () => {
-    const parentHost = createHostMock();
+    const coordinatorHost = createHostMock();
     const childHost = createHostMock();
-    const channel = new Channel('1', parentHost);
+    const channel = new Channel('1', coordinatorHost);
     const expected = {
       action: {
         type: 'message',
@@ -57,18 +57,18 @@ describe('Channel', () => {
     channel.addConnection(childHost);
     channel.broadcast({ type: 'message' });
 
-    expect(parentHost.postMessage).toHaveBeenCalledTimes(1);
+    expect(coordinatorHost.postMessage).toHaveBeenCalledTimes(1);
     expect(childHost.postMessage).toHaveBeenCalledTimes(2);
-    expect(parentHost.postMessage.mock.calls[0][0]).toEqual(expected);
+    expect(coordinatorHost.postMessage.mock.calls[0][0]).toEqual(expected);
     expect(childHost.postMessage.mock.calls[1][0]).toEqual(expected);
   });
 
   it('should broadcast history on connected', () => {
-    const parentHost = createHostMock();
+    const coordinatorHost = createHostMock();
     const childHost = createHostMock();
-    const channel = new Channel('1', parentHost);
+    const channel = new Channel('1', coordinatorHost);
 
-    dateMock.mockImplementation(() => 10);
+    dateMock.mockReturnValue(10);
     channel.broadcast({ type: 'first' });
     channel.addConnection(childHost);
 
@@ -101,20 +101,20 @@ describe('Channel', () => {
   });
 
   it('should broadcast once per distinct connection', () => {
-    const parentHost = createHostMock();
+    const coordinatorHost = createHostMock();
     const childHost = createHostMock();
-    const channel = new Channel('1', parentHost);
+    const channel = new Channel('1', coordinatorHost);
 
     channel.addConnection(childHost);
-    channel.addConnection(parentHost);
+    channel.addConnection(coordinatorHost);
     channel.addConnection(childHost);
 
-    expect(parentHost.postMessage).toHaveBeenCalledTimes(1);
+    expect(coordinatorHost.postMessage).toHaveBeenCalledTimes(1);
     expect(childHost.postMessage).toHaveBeenCalledTimes(2);
 
     channel.broadcast({ type: 'message' });
 
-    expect(parentHost.postMessage).toHaveBeenCalledTimes(2);
+    expect(coordinatorHost.postMessage).toHaveBeenCalledTimes(2);
     expect(childHost.postMessage).toHaveBeenCalledTimes(3);
   });
 });

@@ -20,7 +20,7 @@ export class Receiver {
   }
 
   private setupActions(): void {
-    const messages$: Observable<PostMessageEvent> = fromEvent(window, 'message').pipe(
+    const messages$: Observable<PostMessageEvent> = fromEvent(this.options.host, 'message').pipe(
       onlyValidMessages(),
       onlyOfChannel(this.options.channelId),
     );
@@ -42,9 +42,7 @@ export class Receiver {
   }
 
   private setupConnection(): void {
-    const coordinator = window.top;
-
-    coordinator.postMessage(
+    this.options.coordinatorHost.postMessage(
       {
         action: { type: INTERNAL_TYPES.connect, timestamp: Date.now() },
         channelId: this.options.channelId,
