@@ -2,13 +2,13 @@ import { LIB_ID } from '../models/constants';
 import { Host } from '../models/host';
 import { Coordinator } from './coordinator';
 
-export function setupPostQuecast(host: Host = window): void {
-  if (!!(host as any)[LIB_ID]) {
+export function setupPostQuecast(coordinatorHost: Host = window): void {
+  if (!!(coordinatorHost as any)[LIB_ID]) {
     throw Error(`You can only setup Post Quecast once on given host.`);
   }
 
-  const coordinator = new Coordinator(host);
+  const coordinator = new Coordinator(coordinatorHost);
 
   coordinator.init();
-  (host as any)[LIB_ID] = coordinator;
+  (coordinatorHost as any)[LIB_ID] = coordinator;
 }
