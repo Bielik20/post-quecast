@@ -6,6 +6,10 @@ import { Receiver } from './receiver';
 
 describe('Receiver', () => {
   let scheduler: TestScheduler;
+  const action = {
+    type: 'message',
+    timestamp: 10,
+  };
 
   beforeEach(() => {
     jest.spyOn(Date, 'now').mockReturnValue(10);
@@ -31,13 +35,9 @@ describe('Receiver', () => {
     });
   });
 
-  it('should expose actions', () => {
+  it('should expose public actions', () => {
     const host = createHostMock();
     const receiver = new Receiver({ host, coordinatorHost: host, channelId: '1' });
-    const action = {
-      type: 'message',
-      timestamp: 10,
-    };
 
     assertStream(receiver.actions$, '()', {});
 
@@ -53,13 +53,9 @@ describe('Receiver', () => {
     assertStream(receiver.actions$, '(a)', { a: action });
   });
 
-  it('should expose only public actions', () => {
+  it('should not expose private actions', () => {
     const host = createHostMock();
     const receiver = new Receiver({ host, coordinatorHost: host, channelId: '1' });
-    const action = {
-      type: 'message',
-      timestamp: 10,
-    };
 
     assertStream(receiver.actions$, '()', {});
 
@@ -76,9 +72,49 @@ describe('Receiver', () => {
     assertStream(receiver.actions$, '()', {});
   });
 
-  it('should keep actions history');
+  it('should keep actions history', () => {
+    const host = createHostMock();
+    const receiver = new Receiver({ host, coordinatorHost: host, channelId: '1' });
 
-  it('should keep actions history if no subscriber');
+    assertStream(receiver.actions$, '()', {});
+
+    host.postMessage(
+      {
+        action: {
+          type: INTERNAL_TYPES.connected,
+          history: [action, action, action],
+          timestamp: 10,
+        },
+        private: true,
+        channelId: '1',
+        libId: LIB_ID,
+      },
+      '*',
+    );
+
+    assertStream(receiver.actions$, '(abc)', { a: action, b: action, c: action });
+  });
+
+  it('should keep actions history if no subscriber', () => {
+    const host = createHostMock();
+    const receiver = new Receiver({ host, coordinatorHost: host, channelId: '1' });
+
+    host.postMessage(
+      {
+        action: {
+          type: INTERNAL_TYPES.connected,
+          history: [action, action, action],
+          timestamp: 10,
+        },
+        private: true,
+        channelId: '1',
+        libId: LIB_ID,
+      },
+      '*',
+    );
+
+    assertStream(receiver.actions$, '(abc)', { a: action, b: action, c: action });
+  });
 
   it('should work for coordinator and child');
 
