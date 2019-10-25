@@ -1,5 +1,5 @@
 import { LIB_ID } from '../models/constants';
-import { createHostStub } from '../models/host.stub';
+import { createHostMock } from '../models/host.mock';
 import { Coordinator } from './coordinator';
 import { setupPostQuecast } from './setup';
 
@@ -19,7 +19,7 @@ describe('setupPostQuecast', () => {
   });
 
   it('should work on custom host', () => {
-    const hostStub = createHostStub();
+    const hostStub = createHostMock();
 
     setupPostQuecast(hostStub);
     expect(Coordinator).toHaveBeenCalledTimes(1);
@@ -27,8 +27,8 @@ describe('setupPostQuecast', () => {
   });
 
   it('should work for two different hosts', () => {
-    const host1 = createHostStub();
-    const host2 = createHostStub();
+    const host1 = createHostMock();
+    const host2 = createHostMock();
 
     setupPostQuecast(host1);
     setupPostQuecast(host2);
@@ -38,7 +38,7 @@ describe('setupPostQuecast', () => {
   });
 
   it('should work only once for one host', () => {
-    const hostStub = createHostStub();
+    const hostStub = createHostMock();
 
     setupPostQuecast(hostStub);
 

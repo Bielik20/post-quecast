@@ -19,7 +19,7 @@ export class Transmitter {
       {
         action: {
           ...action,
-          timestamp: new Date().getTime(),
+          timestamp: Date.now(),
         },
         channelId: this.options.channelId,
         private: true,

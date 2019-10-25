@@ -26,7 +26,7 @@ export class Channel {
     return {
       type: INTERNAL_TYPES.connected,
       history: this.history,
-      timestamp: new Date().getTime(),
+      timestamp: Date.now(),
     };
   }
 

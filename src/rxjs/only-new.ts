@@ -3,7 +3,7 @@ import { filter } from 'rxjs/operators';
 import { Action } from '../models/action';
 
 export const onlyNew = <T>() => (source: Observable<Action<T>>): Observable<Action<T>> => {
-  const timestamp = new Date().getTime();
+  const timestamp = Date.now();
 
   return source.pipe(filter(event => event.timestamp > timestamp));
 };

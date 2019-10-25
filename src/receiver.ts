@@ -46,7 +46,7 @@ export class Receiver {
 
     coordinator.postMessage(
       {
-        action: { type: INTERNAL_TYPES.connect, timestamp: new Date().getTime() },
+        action: { type: INTERNAL_TYPES.connect, timestamp: Date.now() },
         channelId: this.options.channelId,
         private: true,
         libId: LIB_ID,

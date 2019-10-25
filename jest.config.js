@@ -3,4 +3,5 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.mock.ts'],
 };

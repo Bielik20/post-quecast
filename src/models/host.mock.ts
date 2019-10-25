@@ -2,21 +2,21 @@ import { Host } from './host';
 import { PostMessageEvent } from './post-message-event';
 
 type Callback = (event: PostMessageEvent) => void;
-export type HostStub = { [key in keyof Host]: jest.SpyInstance & Host[key] } & {
+export type HostMock = { [key in keyof Host]: jest.SpyInstance & Host[key] } & {
   listeners: Callback[];
 };
 
-export function createHostStub(): HostStub {
-  const result: HostStub = {} as any;
+export function createHostMock(): HostMock {
+  const result: HostMock = {} as any;
   const listeners: Callback[] = [];
 
-  const addEventListener: HostStub['addEventListener'] = jest
+  const addEventListener: HostMock['addEventListener'] = jest
     .fn()
     .mockImplementation((type: string, listener: Callback) => {
       listeners.push(listener);
     });
 
-  const removeEventListener: HostStub['removeEventListener'] = jest
+  const removeEventListener: HostMock['removeEventListener'] = jest
     .fn()
     .mockImplementation((listener: Callback) => {
       const index = listeners.findIndex(value => value === listener);
@@ -26,7 +26,7 @@ export function createHostStub(): HostStub {
       }
     });
 
-  const postMessage: HostStub['postMessage'] = jest
+  const postMessage: HostMock['postMessage'] = jest
     .fn()
     .mockImplementation((data: any, origin: string) => {
       listeners.forEach(listener => {
