@@ -40,7 +40,7 @@ export class Coordinator {
 
   private getChannel(channelId: string): Channel {
     if (!this.channels.has(channelId)) {
-      this.channels.set(channelId, new Channel(channelId));
+      this.channels.set(channelId, new Channel(channelId, this.host));
     }
 
     return this.channels.get(channelId);

@@ -3,10 +3,10 @@ import { INTERNAL_TYPES, LIB_ID } from '../models/constants';
 import { Host } from '../models/host';
 
 export class Channel {
-  private connections = new Set<Host>([window.top]);
+  private connections = new Set<Host>([this.host]);
   private history: Action[] = [];
 
-  constructor(private channelId: string) {}
+  constructor(private channelId: string, private host: Host) {}
 
   addConnection(connection: Host): void {
     this.connections.add(connection);

@@ -1,19 +1,14 @@
 import { LIB_ID } from '../models/constants';
+import { Host } from '../models/host';
 import { Coordinator } from './coordinator';
 
-export function setupPostQuecast(): void {
-  const head: any = window.top;
-
-  if (window !== head) {
-    throw Error(`You can only setup Post Quecast on top level window.`);
+export function setupPostQuecast(host: Host = window): void {
+  if (!!(host as any)[LIB_ID]) {
+    throw Error(`You can only setup Post Quecast once on given host.`);
   }
 
-  if (!!head[LIB_ID]) {
-    throw Error(`You can only setup Post Quecast once.`);
-  }
-
-  const coordinator = new Coordinator(head);
+  const coordinator = new Coordinator(host);
 
   coordinator.init();
-  head[LIB_ID] = coordinator;
+  (host as any)[LIB_ID] = coordinator;
 }
