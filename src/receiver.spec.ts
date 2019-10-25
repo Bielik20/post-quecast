@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import { TestScheduler } from 'rxjs/testing';
 import { INTERNAL_TYPES, LIB_ID } from './models/constants';
 import { createHostMock } from './models/host.mock';
@@ -38,12 +39,7 @@ describe('Receiver', () => {
       timestamp: 10,
     };
 
-    scheduler.run(({ expectObservable }) => {
-      const expectedMarble = '()';
-      const expectedIngredients = {};
-
-      expectObservable(receiver.actions$).toBe(expectedMarble, expectedIngredients);
-    });
+    assertStream(receiver.actions$, '()', {});
 
     host.postMessage(
       {
@@ -54,17 +50,31 @@ describe('Receiver', () => {
       '*',
     );
 
-    scheduler.run(({ expectObservable }) => {
-      const expectedMarble = '(a)';
-      const expectedIngredients = {
-        a: action,
-      };
-
-      expectObservable(receiver.actions$).toBe(expectedMarble, expectedIngredients);
-    });
+    assertStream(receiver.actions$, '(a)', { a: action });
   });
 
-  it('should expose only public actions');
+  it('should expose only public actions', () => {
+    const host = createHostMock();
+    const receiver = new Receiver({ host, coordinatorHost: host, channelId: '1' });
+    const action = {
+      type: 'message',
+      timestamp: 10,
+    };
+
+    assertStream(receiver.actions$, '()', {});
+
+    host.postMessage(
+      {
+        action,
+        channelId: '1',
+        libId: LIB_ID,
+        private: true,
+      },
+      '*',
+    );
+
+    assertStream(receiver.actions$, '()', {});
+  });
 
   it('should keep actions history');
 
@@ -73,4 +83,10 @@ describe('Receiver', () => {
   it('should work for coordinator and child');
 
   it('should work for multiple channels');
+
+  function assertStream(stream$: Observable<any>, marbles: string, values: any): void {
+    scheduler.run(({ expectObservable }) => {
+      expectObservable(stream$).toBe(marbles, values);
+    });
+  }
 });
