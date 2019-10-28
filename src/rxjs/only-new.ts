@@ -5,5 +5,5 @@ import { Action } from '../models/action';
 export const onlyNew = <T>() => (source: Observable<Action<T>>): Observable<Action<T>> => {
   const timestamp = Date.now();
 
-  return source.pipe(filter(event => event.timestamp > timestamp));
+  return source.pipe(filter(action => action.timestamp > timestamp));
 };
