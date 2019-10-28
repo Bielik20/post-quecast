@@ -39,7 +39,7 @@ export class Receiver {
     );
 
     this.actions$ = merge(history$, public$).pipe(shareReplay());
-    this.actions$.subscribe(); // TODO: Find more elegant way (should keep actions history if no subscriber)
+    this.actions$.subscribe(); // start listening right away
   }
 
   private setupConnection(): void {
